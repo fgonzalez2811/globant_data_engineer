@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -7,15 +8,15 @@ class Department(Base):
     __tablename__= "departments"
 
     id = Column(Integer, primary_key=True, index=True)
-    department = Column(String, nullable=False)
+    name = Column(String, nullable=False)
 
-    hired_employees = relationship("HiredEmployee", back_populates= "departments_rel")
+    hired_employees = relationship("HiredEmployee", back_populates= "department_rel")
 
 class Job(Base):
     __tablename__= "jobs"
 
     id = Column(Integer, primary_key=True, index=True)
-    job = Column(String, nullable=False)
+    name = Column(String, nullable=False)
 
     hired_employees = relationship("HiredEmployee", back_populates="job_rel")
 
@@ -24,9 +25,9 @@ class HiredEmployee(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    datetime = Column(DateTime)
-    department_id = Column(Integer, ForeignKey("departments.id"))
-    job_id = Column(Integer, ForeignKey("jobs.id"))
+    datetime = Column(DateTime, default=func.now(), nullable=False)
+    department_id = Column(Integer, ForeignKey("departments.id"), nullable=False)
+    job_id = Column(Integer, ForeignKey("jobs.id"), nullable=False)
 
     department_rel = relationship("Department", back_populates="hired_employees")
     job_rel = relationship("Job", back_populates="hired_employees")
