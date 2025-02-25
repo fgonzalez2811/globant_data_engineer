@@ -36,21 +36,8 @@ def get_db():
 
 @app.get('/')
 def index(db: Session = Depends(get_db)):
-
-    # Create test instances in database:
-    new_department = Department(name="Logistics")
-    db.add(new_department)
-    db.commit()
     
-    new_job = Job(name="Manager")
-    db.add(new_job)
-    db.commit()
-    
-    new_employee = HiredEmployee(name="Jhon", datetime=datetime.now(), department_id=1, job_id=1)
-    db.add(new_employee)
-    db.commit()
-    
-    # Query database for employee: 'jhon'
+    # Query database for employees
     employees = db.query(HiredEmployee).all()
 
     return {'data':'Hello Globant', 'employees': employees}
