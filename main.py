@@ -2,10 +2,10 @@ from fastapi import FastAPI, Depends, UploadFile, File
 from typing import List
 from contextlib import asynccontextmanager
 from models import Department, Job, HiredEmployee
-from database import Base, SessionLocal, engine
+from database import Base, engine
+from helpers import get_db
 from io import StringIO
 import pandas as pd
-
 
 # SQLAlchemy imports
 from sqlalchemy.exc import SQLAlchemyError
@@ -24,15 +24,6 @@ async def lifespan(app: FastAPI):
     
 app = FastAPI(lifespan=lifespan)
 
-def get_db():
-    # Create session:
-    db = SessionLocal()
-    
-    # yield session and wait until transaction ends, then close session:
-    try:
-        yield db
-    finally:
-        db.close()
 
 @app.get('/')
 def index(db: Session = Depends(get_db)):
