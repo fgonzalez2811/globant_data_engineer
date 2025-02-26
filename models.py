@@ -7,7 +7,7 @@ from database import Base
 class Department(Base):
     __tablename__= "departments"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=False)
     name = Column(String, nullable=False, unique=True)
 
     hired_employees = relationship("HiredEmployee", back_populates= "department_rel")
@@ -15,7 +15,7 @@ class Department(Base):
 class Job(Base):
     __tablename__= "jobs"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=False)
     name = Column(String, nullable=False)
 
     hired_employees = relationship("HiredEmployee", back_populates="job_rel")
@@ -23,7 +23,7 @@ class Job(Base):
 class HiredEmployee(Base):
     __tablename__= "hired_employees"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=False)
     name = Column(String, nullable=False)
     datetime = Column(DateTime, default=func.now(), nullable=False)
     department_id = Column(Integer, ForeignKey("departments.id"), nullable=False)
