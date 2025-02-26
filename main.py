@@ -50,6 +50,11 @@ async def ingest_csv(departments_file: UploadFile = File(...), jobs_file: Upload
         cleaned_jobs_df = clean_data(jobs_df)
         cleaned_hired_employees_df = clean_data(hired_employees_df)
 
+        # Get invalid rows from uploaded files to log in the response:
+        departments_invalid_rows = get_invalid_rows(departments_df)
+        jobs_invalid_rows = get_invalid_rows(departments_df)
+        employees_invalid_rows = get_invalid_rows(hired_employees_df)
+
         # Convert data frames to dicts to enable batch inserts
         departments_dict = cleaned_departments_df.to_dict(orient="records")
         jobs_dict = cleaned_jobs_df.to_dict(orient="records")
@@ -85,7 +90,15 @@ async def ingest_csv(departments_file: UploadFile = File(...), jobs_file: Upload
             # save to database
             db.commit()
 
-            return {"message": "Files uploaded and data inserted in batches successfully"}
+            # count inserted and not inserted rows
+            new_rows_count = len(filtered_hired_employees) + len(filtered_departments) + len(filtered_jobs)
+            not_inserted_rows_count = sum(len(v) for v in employees_invalid_rows.values()) + sum(len(v) for v in departments_invalid_rows.values()) + sum(len(v) for v in jobs_invalid_rows.values())
+            
+
+            return {"message": f"Files uploaded and data inserted in batches successfully - {new_rows_count} total rows inserted and {not_inserted_rows_count} rows ignored",
+                     "Ignored rows" : {"Departments": departments_invalid_rows,
+                                   "Jobs": jobs_invalid_rows,
+                                   "Hired Employees": employees_invalid_rows}}
         
         except Exception as e:
             # Rollback in case of error:
