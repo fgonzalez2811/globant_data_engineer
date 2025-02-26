@@ -3,7 +3,7 @@ from typing import List
 from contextlib import asynccontextmanager
 from models import Department, Job, HiredEmployee
 from database import Base, engine
-from helpers import get_db
+from helpers import get_db, clean_data, get_invalid_rows
 from io import StringIO
 import pandas as pd
 
@@ -39,19 +39,20 @@ async def ingest_csv(departments_file: UploadFile = File(...), jobs_file: Upload
 
     try:
         # Read CSV files to dataframes
-        departments_df = pd.read_csv(StringIO((await departments_file.read()).decode('utf-8')))
-        jobs_df = pd.read_csv(StringIO((await jobs_file.read()).decode('utf-8')))
-        hired_employees_df = pd.read_csv(StringIO((await hired_employees_file.read()).decode('utf-8')))
+        departments_df = pd.read_csv(StringIO((await departments_file.read()).decode('utf-8')), names=['id', 'name'], header=None)
+        jobs_df = pd.read_csv(StringIO((await jobs_file.read()).decode('utf-8')), names=['id', 'name'], header=None)
+        hired_employees_df = pd.read_csv(StringIO((await hired_employees_file.read()).decode('utf-8')), names=['id', 'name', 'datetime', 'department_id', 'job_id'], header=None)
 
         print('Dataframes:')
         print(departments_df)
         print(jobs_df)
         print(hired_employees_df)
+        
 
-        # Convert data frames to dicts to enable batch inserts
-        departments_dict = departments_df.to_dict(orient="records")
-        jobs_dict = jobs_df.to_dict(orient="records")
-        hired_employees_dict = hired_employees_df.to_dict(orient="records")
+        # Clean and Convert data frames to dicts to enable batch inserts
+        departments_dict = clean_data(departments_df).to_dict(orient="records")
+        jobs_dict = clean_data(jobs_df).to_dict(orient="records")
+        hired_employees_dict = clean_data(hired_employees_df).to_dict(orient="records")
 
         # Insert data in batches up to 1000 rows
         BATCH_SIZE = 1000
