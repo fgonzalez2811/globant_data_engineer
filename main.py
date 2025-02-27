@@ -12,7 +12,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):  
     # Create data tables from models if they don't exist:
@@ -100,7 +99,7 @@ def get_quarterly_hires(db: Session = Depends(get_db)):
     except SQLAlchemyError as e:
         return {'message': 'There was an error retrieving the data', 'Error': f'{e}'}
 
-@app.post('/upload-csv/')
+@app.post('/upload-csv')
 async def ingest_csv(departments_file: UploadFile = File(...), 
                      jobs_file: UploadFile = File(...), 
                      hired_employees_file: UploadFile = File(...), 
