@@ -25,35 +25,80 @@ async def lifespan(app: FastAPI):
     
 app = FastAPI(lifespan=lifespan)
 
+@app.get('/hires-above-average-2021')
+def get_above_avg_hires(db: Session = Depends(get_db)):
 
-@app.get('/quarterly-hires')
+    try:
+        # Create Query to retrieve departments that hired above average in 2021:
+        query = text("""
+            WITH 
+                     
+            total_hires AS
+                (SELECT d.id AS id, d.name AS department, COUNT(*) AS hire_count
+                FROM departments d
+                JOIN hired_employees e ON d.id = e.department_id
+                WHERE EXTRACT(YEAR FROM e.datetime) = 2021
+                GROUP BY d.id, d.name),
+                     
+            avg_hires AS 
+                (SELECT AVG(hire_count) AS avg_value FROM total_hires)
+                     
+            SELECT th.id AS id, th.department AS department, th.hire_count AS hired
+            FROM total_hires th
+            WHERE hire_count > (SELECT avg_value FROM avg_hires)
+            ORDER BY th.hire_count DESC;
+            """)
+        
+        results = db.execute(query).fetchall()
+
+        # check is there were results
+        if not results:
+            return {'message':'No records found'}
+        else:
+            # Unpack results into a dict
+            columns = ["id", "department", "hired"]
+            results_dict = [dict(zip(columns, row)) for row in results]
+
+            return {'message': 'Data extracted succesfully', 'data': results_dict}
+
+    except SQLAlchemyError as e:
+        return {'message': 'There was an error retrieving the data', 'Error': f'{e}'}
+
+@app.get('/quarterly-hires-2021')
 def get_quarterly_hires(db: Session = Depends(get_db)):
     
-    # Create SQL query
-    query = text(""" 
-    SELECT 
-    d.name AS Department, 
-    j.name AS Job, 
-    COUNT(CASE WHEN EXTRACT(MONTH FROM e.datetime) IN (1,2,3) THEN 1 END) AS Q1, 
-    COUNT(CASE WHEN EXTRACT(MONTH FROM e.datetime) IN (4,5,6) THEN 1 END) AS Q2, 
-    COUNT(CASE WHEN EXTRACT(MONTH FROM e.datetime) IN (7,8,9) THEN 1 END) AS Q3, 
-    COUNT(CASE WHEN EXTRACT(MONTH FROM e.datetime) IN (10,11,12) THEN 1 END) AS Q4
-    FROM departments d
-    JOIN hired_employees e ON d.id = e.department_id
-    JOIN jobs j ON e.job_id = j.id
-    WHERE EXTRACT(YEAR FROM e.datetime) = 2021
-    GROUP BY d.name, j.name
-    ORDER BY d.name ASC, j.name ASC;""")
-    
-    # Excecute query
-    results = db.execute(query).fetchall()
-    
-    # Unpack results into a dict
-    columns = ["Department", "Job", "Q1", "Q2", "Q3", "Q4"]
-    results_dict = [dict(zip(columns, row)) for row in results]
+    try:
+        # Create SQL query to get number of employees hired in each quarter of 2021 per job per department:
+        query = text(""" 
+            SELECT 
+            d.name AS Department, 
+            j.name AS Job, 
+            COUNT(CASE WHEN EXTRACT(MONTH FROM e.datetime) IN (1,2,3) THEN 1 END) AS Q1, 
+            COUNT(CASE WHEN EXTRACT(MONTH FROM e.datetime) IN (4,5,6) THEN 1 END) AS Q2, 
+            COUNT(CASE WHEN EXTRACT(MONTH FROM e.datetime) IN (7,8,9) THEN 1 END) AS Q3, 
+            COUNT(CASE WHEN EXTRACT(MONTH FROM e.datetime) IN (10,11,12) THEN 1 END) AS Q4
+            FROM departments d
+            JOIN hired_employees e ON d.id = e.department_id
+            JOIN jobs j ON e.job_id = j.id
+            WHERE EXTRACT(YEAR FROM e.datetime) = 2021
+            GROUP BY d.name, j.name
+            ORDER BY d.name ASC, j.name ASC;""")
+        
+        # Excecute query
+        results = db.execute(query).fetchall()
+        
+        # check is there were results
+        if not results:
+            return {'message':'No records found'}
+        else:
+            # Unpack results into a dict
+            columns = ["Department", "Job", "Q1", "Q2", "Q3", "Q4"]
+            results_dict = [dict(zip(columns, row)) for row in results]
 
-    return {'message': 'data succesfuly obtained', 'data': results_dict}
-
+            return {'message': 'Data extracted succesfully', 'data': results_dict}
+    
+    except SQLAlchemyError as e:
+        return {'message': 'There was an error retrieving the data', 'Error': f'{e}'}
 
 @app.post('/upload-csv/')
 async def ingest_csv(departments_file: UploadFile = File(...), 
