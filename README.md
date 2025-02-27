@@ -248,3 +248,29 @@ There are multiple valid approaches to building the requested solution. In this 
 3. **`models.py`**: Contains the PostgreSQL database models.
    
 4. **`database.py`**: Sets up database connection and configures SQLAlchemy to be used as ORM for the project.
+
+## ETL Pipeline: Data Ingestion, Transformation, and Storage
+
+1. **Extract**: Receiving and Reading CSV Files
+     - The API exposes a POST /upload-csv/ endpoint that receives three CSV files in a single request:
+          - departments.csv
+          - jobs.csv
+          - hired_employees.csv
+     - These files are uploaded as multipart/form-data and processed using Pandas.
+     - Each file is read into a DataFrame to allow further validation and transformations.
+  
+2. **Transform**: Cleaning and Validating Data
+   - The project uses helper functions (helpers.py) to clean and validate data before inserting it into the database.
+   - Key transformations:
+     - The function get_invalid_rows(df) identifies rows with missing or invalid data.
+     - clean_data(df) standardizes and transforms data as needed before insertion.
+     - Invalid rows are logged and returned in the response to ensure transparency about ignored data.
+  
+3. **Load**: Inserting Data into PostgreSQL
+   - Batch Insertions: The API supports inserting 1 to 1,000 rows per request, optimizing performance.
+   - SQLAlchemy ORM is used for inserting data efficiently into the PostgreSQL database.
+   - The database structure follows normalized relational design:
+        - departments (ID, name)
+        - jobs (ID, name)
+        - hired_employees (ID, name, datetime, department_id, job_id)
+   - The API ensures that all three tables are populated in a single request, preventing inconsistencies in relational data.
