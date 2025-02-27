@@ -10,6 +10,7 @@ import pandas as pd
 # SQLAlchemy imports
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 
 @asynccontextmanager
@@ -25,19 +26,40 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 
-@app.get('/')
-def index(db: Session = Depends(get_db)):
+@app.get('/quarterly-hires')
+def get_quarterly_hires(db: Session = Depends(get_db)):
     
-    # Query database tables
-    employees = db.query(HiredEmployee).all()
-    departments = db.query(Department).all()
-    jobs = db.query(Job).all()
+    # Create SQL query
+    query = text(""" 
+    SELECT 
+    d.name AS Department, 
+    j.name AS Job, 
+    COUNT(CASE WHEN EXTRACT(MONTH FROM e.datetime) IN (1,2,3) THEN 1 END) AS Q1, 
+    COUNT(CASE WHEN EXTRACT(MONTH FROM e.datetime) IN (4,5,6) THEN 1 END) AS Q2, 
+    COUNT(CASE WHEN EXTRACT(MONTH FROM e.datetime) IN (7,8,9) THEN 1 END) AS Q3, 
+    COUNT(CASE WHEN EXTRACT(MONTH FROM e.datetime) IN (10,11,12) THEN 1 END) AS Q4
+    FROM departments d
+    JOIN hired_employees e ON d.id = e.department_id
+    JOIN jobs j ON e.job_id = j.id
+    WHERE EXTRACT(YEAR FROM e.datetime) = 2021
+    GROUP BY d.name, j.name
+    ORDER BY d.name ASC, j.name ASC;""")
+    
+    # Excecute query
+    results = db.execute(query).fetchall()
+    
+    # Unpack results into a dict
+    columns = ["Department", "Job", "Q1", "Q2", "Q3", "Q4"]
+    results_dict = [dict(zip(columns, row)) for row in results]
 
-    return {'data':'Hello Globant', 'employees': employees, 'departments':departments, 'jobs':jobs}
+    return {'message': 'data succesfuly obtained', 'data': results_dict}
 
 
 @app.post('/upload-csv/')
-async def ingest_csv(departments_file: UploadFile = File(...), jobs_file: UploadFile = File(...), hired_employees_file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def ingest_csv(departments_file: UploadFile = File(...), 
+                     jobs_file: UploadFile = File(...), 
+                     hired_employees_file: UploadFile = File(...), 
+                     db: Session = Depends(get_db)):
 
     try:
         # Read CSV files to dataframes
