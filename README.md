@@ -96,11 +96,7 @@ There are multiple valid approaches to building the requested solution. In this 
      ```
      **Response example:**
      ```JSON
-     {"message":"Files uploaded and data inserted in batches successfully - 2124 total rows inserted and 70 rows ignored","Ignored rows":{"Departments":{"no_name_rows":[],"incomplete_rows":[]},"Jobs":{"no_name_rows":[],"incomplete_rows":[]},"Hired Employees":{"no_name_rows":[{"id":162,"name":null,"datetime":"2021-04-22T14:31:39Z","department_id":4.0,"job_id":91.0},{"id":340,"name":null,"datetime":"2022-01-13T21:09:49Z","department_id":4.0,"job_id":45.0},{"id":350,"name":null,"datetime":"2021-07-13T23:34:40Z","department_id":10.0,"job_id":86.0},{"id":571,"name":null,"datetime":"2021-11-28T02:28:40Z","department_id":7.0,"job_id":69.0},{"id":623,"name":null,"datetime":"2022-01-04T17:42:48Z","department_id":7.0,"job_id":48.0},
-     """
-     ...
-
-     """
+     {"message":"Files uploaded and data inserted in batches successfully - 2124 total rows inserted and 70 rows ignored","Ignored rows":{"Departments":{"no_name_rows":[],"incomplete_rows":[]},"Jobs":{"no_name_rows":[],"incomplete_rows":[]},"Hired Employees":{"no_name_rows":[{"id":162,"name":null,"datetime":"2021-04-22T14:31:39Z","department_id":4.0,"job_id":91.0},{"id":340,"name":null,"datetime":"2022-01-13T21:09:49Z","department_id":4.0,"job_id":45.0},{"id":350,"name":null,"datetime":"2021-07-13T23:34:40Z","department_id":10.0,"job_id":86.0},{"id":571,"name":null,"datetime":"2021-11-28T02:28:40Z","department_id":7.0,"job_id":69.0},{"id":623,"name":null,"datetime":"2022-01-04T17:42:48Z","department_id":7.0,"job_id":48.0}]}}}
      ```
 
 ### 4.2. Get list of jobs and departments with count of hires by quarter of 2021
@@ -158,11 +154,8 @@ There are multiple valid approaches to building the requested solution. In this 
       "Q2": 1,
       "Q3": 0,
       "Q4": 0
-    },
-    """
-    ...
-
-    """
+    }]}
+    
      ```
 
 
