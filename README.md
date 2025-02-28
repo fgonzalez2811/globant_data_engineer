@@ -1,7 +1,21 @@
-# Globant Data Engineer Interview Assignment
+# Globant Data Engineer Interview Assignment  <!-- omit from toc -->
 Developer: Felipe González Vásquez
 
-## Introduction
+## Table of Contents <!-- omit from toc -->
+- [1. Introduction](#1-introduction)
+- [2. Tech Stack and Architecture](#2-tech-stack-and-architecture)
+- [3. Installation and setup](#3-installation-and-setup)
+- [4. API Endpoints](#4-api-endpoints)
+  - [4.1. Upload CSV files](#41-upload-csv-files)
+  - [4.2. Get list of jobs and departments with count of hires by quarter of 2021](#42-get-list-of-jobs-and-departments-with-count-of-hires-by-quarter-of-2021)
+  - [4.3. Get list of departments and count of hires that were above average in 2021](#43-get-list-of-departments-and-count-of-hires-that-were-above-average-in-2021)
+- [5. Database structure](#5-database-structure)
+  - [5.1. Database Schema](#51-database-schema)
+- [6. Files overview](#6-files-overview)
+- [7. ETL Pipeline: Data Ingestion, Transformation, and Storage](#7-etl-pipeline-data-ingestion-transformation-and-storage)
+
+
+## 1. Introduction
 This project was developed as part of a Data Engineering interview assignment from Globant.
 
 **The assignment consists of two sections:**
@@ -16,7 +30,7 @@ This project was developed as part of a Data Engineering interview assignment fr
 
 The frameworks, libraries, databases or cloud services used are entirely up to me. In the following section, I will explain my tool stack choices.
 
-## Tech Stack and Architecture
+## 2. Tech Stack and Architecture
 
 There are multiple valid approaches to building the requested solution. In this project, I propose two possible implementations:
 
@@ -24,7 +38,7 @@ There are multiple valid approaches to building the requested solution. In this 
 
 2. **Scalable Cloud-Based Solution:** a more robust, cloud based, distributed architecture designed for significantly larger datasets (over 1 million rows). The architecture for this solution is outlined at the end of this document.
 
-### Tech Stack:
+### Tech Stack <!-- omit from toc -->
 - **FastAPI**: A high-performance API framework with asynchronous support, automatic documentation, and built-in data validation, making it ideal for scalable and efficient API development.
   
 - **PostgreSQL**: A powerful, ACID-compliant relational database known for reliability, scalability, and strong support for complex queries, making it well-suited for structured data storage.
@@ -39,7 +53,7 @@ There are multiple valid approaches to building the requested solution. In this 
   
 - **Docker Compose**: Manages multi-container setups efficiently, automating the deployment of FastAPI, PostgreSQL, and other dependencies in a single configuration.
 
-## Installation and setup
+## 3. Installation and setup
 
 
 1. Make sure you have docker installed, if not, install it:
@@ -63,9 +77,9 @@ There are multiple valid approaches to building the requested solution. In this 
      ```
 5. Access the documentation at http://127.0.0.1:8000/docs
 
-## API Endpoints
+## 4. API Endpoints
 
-### Upload CSV files
+### 4.1. Upload CSV files
 
 - **POST** `/upload-csv/`
   
@@ -89,7 +103,7 @@ There are multiple valid approaches to building the requested solution. In this 
      """
      ```
 
-### Get list of jobs and departments with count of hires by quarter of 2021
+### 4.2. Get list of jobs and departments with count of hires by quarter of 2021
 
 - **GET** `/quarterly-hires-2021`
   
@@ -152,7 +166,7 @@ There are multiple valid approaches to building the requested solution. In this 
      ```
 
 
-### Get list of departments and count of hires that were above average in 2021
+### 4.3. Get list of departments and count of hires that were above average in 2021
 
 - **GET** `/hires-above-average-2021`
      
@@ -207,25 +221,25 @@ There are multiple valid approaches to building the requested solution. In this 
      }
      ```
 
-## Database structure
+## 5. Database structure
 
-### Database Schema
+### 5.1. Database Schema
 
-#### departments
+#### departments <!-- omit from toc -->
   
      | Column  | Type  | Description |
      |---------|-------|-------------|
      | id      | INT   | Primary Key |
      | name    | TEXT  | Name of the department |
 
-#### jobs
+#### jobs <!-- omit from toc -->
   
      | Column  | Type  | Description |
      |---------|-------|-------------|
      | id      | INT   | Primary Key |
      | name    | TEXT  | Name of the job position |
 
-#### hired_employees
+#### hired_employees <!-- omit from toc -->
   
      | Column          | Type      | Description |
      |----------------|----------|-------------|
@@ -235,7 +249,7 @@ There are multiple valid approaches to building the requested solution. In this 
      | department_id | INT      | Foreign Key → `departments(id)` |
      | job_id        | INT      | Foreign Key → `jobs(id)` |
 
-## Files overview
+## 6. Files overview
 
 1.  **`main.py`:** Contains the FastAPI REST API .
    
@@ -249,7 +263,7 @@ There are multiple valid approaches to building the requested solution. In this 
    
 4. **`database.py`**: Sets up database connection and configures SQLAlchemy to be used as ORM for the project.
 
-## ETL Pipeline: Data Ingestion, Transformation, and Storage
+## 7. ETL Pipeline: Data Ingestion, Transformation, and Storage
 
 1. **Extract**: Receiving and Reading CSV Files
      - The API exposes a POST /upload-csv/ endpoint that receives three CSV files in a single request:
