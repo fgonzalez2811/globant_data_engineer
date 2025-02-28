@@ -1,9 +1,10 @@
 from fastapi import FastAPI, Depends, UploadFile, File
+from fastapi.responses import RedirectResponse
 from typing import List
 from contextlib import asynccontextmanager
-from models import Department, Job, HiredEmployee
-from database import Base, engine
-from helpers import get_db, clean_data, get_invalid_rows
+from app.models import Department, Job, HiredEmployee
+from app.database import Base, engine
+from app.helpers import get_db, clean_data, get_invalid_rows
 from io import StringIO
 import pandas as pd
 
@@ -23,6 +24,11 @@ async def lifespan(app: FastAPI):
     yield 
     
 app = FastAPI(lifespan=lifespan)
+
+@app.get('/', include_in_schema=False)
+def root():
+    # Redirect root endpoint to docs:
+    return RedirectResponse(url="/docs")
 
 @app.get('/hires-above-average-2021')
 def get_above_avg_hires(db: Session = Depends(get_db)):

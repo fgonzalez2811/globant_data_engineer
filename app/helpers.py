@@ -4,7 +4,7 @@ imported into main.py file to improve
 maintainability and readibility
 
 """
-from database import SessionLocal
+from app.database import SessionLocal
 import pandas as pd
 import numpy as np
 
