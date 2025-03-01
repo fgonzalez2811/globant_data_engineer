@@ -13,6 +13,9 @@ Developer: Felipe González Vásquez
   - [5.1. Database Schema](#51-database-schema)
 - [6. Files overview](#6-files-overview)
 - [7. ETL Pipeline: Data Ingestion, Transformation, and Storage](#7-etl-pipeline-data-ingestion-transformation-and-storage)
+- [8. Alernative Solution: Using Google Cloud for a more robust and scalable solution](#8-alernative-solution-using-google-cloud-for-a-more-robust-and-scalable-solution)
+  - [8.1. Google Cloud Services Used:](#81-google-cloud-services-used)
+  - [8.2. Graphical Representation:](#82-graphical-representation)
 
 
 ## 1. Introduction
@@ -281,3 +284,49 @@ There are multiple valid approaches to building the requested solution. In this 
         - jobs (ID, name)
         - hired_employees (ID, name, datetime, department_id, job_id)
    - The API ensures that all three tables are populated in a single request, preventing inconsistencies in relational data.
+  
+## 8. Alernative Solution: Using Google Cloud for a more robust and scalable solution
+
+In this section, I will explain how to implement the same solution using Google Cloud services. This approach enables more data-intensive processing and automatically scales to handle larger files, including those exceeding 1 million rows.
+
+### 8.1. Google Cloud Services Used:
+
+1. **Google Cloud Storage (GCS)**
+
+     A GCS bucket acts as a data lake, storing raw, unprocessed CSV files before transformation.
+ 
+2. **Cloud Run (FastAPI-based API)**
+
+     The API is deployed on Cloud Run and serves two main purposes:
+
+     1. **Triggering Data Processing:**
+     
+          A POST request sends a Pub/Sub message to start a new Dataproc processing job.
+          
+     2. **Querying Processed Data:**
+     
+          A GET request retrieves aggregated sales data from BigQuery.
+          
+3. **Dataproc Serverless for Spark**
+
+     **Why use it?**
+
+    - Handles large-scale batch processing efficiently.
+    - Auto-scales based on data volume, reducing costs.
+    - Ideal for transforming datasets larger than 1 million rows.
+  
+     **How it works:**
+
+     - The Cloud Run API writes a message to Pub/Sub, signaling the arrival of a new CSV file.
+     - A Dataproc Serverless Spark job is triggered.
+     - Spark reads the CSV file from GCS and applies transformations such as data cleaning, deduplication, and aggregation.
+     - The transformed data is written to BigQuery for analytics and reporting.
+
+4. **BigQuery**
+
+     Acts as a data warehouse, storing processed and structured data.
+     The Cloud Run API queries BigQuery to provide real-time insights and reports.
+
+### 8.2. Graphical Representation:
+
+<img src="https://www.mermaidchart.com/raw/84b4612f-22e7-4871-9a27-c62e3f2e5967?theme=light&version=v0.1&format=svg" alt="Data Pipeline Flowchart" width="300">
