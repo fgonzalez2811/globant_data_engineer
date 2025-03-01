@@ -1,18 +1,16 @@
 from fastapi.testclient import TestClient
 from app.main import app, get_db
-import requests
 
 client = TestClient(app)
 
 def test_upload_csv():
     url = "/upload-csv"
     files = {
-    "departments_file": ("departments.csv", open("../data/departments.csv", "rb"), "text/csv"),
-    "jobs_file": ("jobs.csv", open("../data/jobs.csv", "rb"), "text/csv"),
-    "hired_employees_file": ("hired_employees.csv", open("../data/hired_employees.csv", "rb"), "text/csv"),
+    "departments_file": ("departments.csv", open("data/departments.csv", "rb"), "text/csv"),
+    "jobs_file": ("jobs.csv", open("data/jobs.csv", "rb"), "text/csv"),
+    "hired_employees_file": ("hired_employees.csv", open("data/hired_employees.csv", "rb"), "text/csv"),
     }
-    response = requests.post(url, files=files)
-
+    response = client.post(url, files=files)
     assert response.status_code == 200  
     assert "message" in response.json()
 
