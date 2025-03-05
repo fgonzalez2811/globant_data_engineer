@@ -95,9 +95,9 @@ There are multiple valid approaches to building the requested solution. In this 
      curl -X POST "localhost:8000/upload-csv" \
      -H "accept: application/json" \
      -H "Content-Type: multipart/form-data" \
-     -F "departments_file=@files/departments.csv;type=text/csv" \
-     -F "jobs_file=@files/Jobs.csv;type=text/csv" \
-     -F "hired_employees_file=@files/hired_employees.csv;type=text/csv"
+     -F "departments_file=@data/departments.csv;type=text/csv" \
+     -F "jobs_file=@data/jobs.csv;type=text/csv" \
+     -F "hired_employees_file=@data/hired_employees.csv;type=text/csv"
      ```
      **Response example:**
      ```JSON
