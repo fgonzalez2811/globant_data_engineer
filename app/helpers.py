@@ -27,8 +27,8 @@ def get_invalid_rows(df):
     else:
         no_name_rows = pd.DataFrame()
 
-    # Get rows with missing datetime, job_id or department_id:
-    required_columns = ['datetime', 'job_id', 'department_id']
+    # Get rows with missing id, datetime, job_id or department_id:
+    required_columns = ['id','datetime', 'job_id', 'department_id']
 
     if set(required_columns).issubset(df.columns):  
         incomplete_rows = df[df[required_columns].isnull().any(axis=1)]
@@ -46,8 +46,11 @@ def get_invalid_rows(df):
     return {'no_name_rows' : no_name_rows, 'incomplete_rows': incomplete_rows}
         
 def clean_data(df):
-    # Drop rows with missing values in name columns:
+    # Drop rows with missing values in name column:
     df = df.dropna(subset=['name'])
+    
+    # Drop rows with missing values in id column:
+    df = df.dropna(subset=['id'])
 
     # Drop rows with missing values in name, datetime, job_id, department_id and store them
     if {'datetime', 'job_id', 'department_id'}.issubset(df.columns):        
