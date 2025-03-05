@@ -12,10 +12,12 @@ Developer: Felipe González Vásquez
 - [5. Database structure](#5-database-structure)
   - [5.1. Database Schema](#51-database-schema)
 - [6. Files overview](#6-files-overview)
-- [7. ETL Pipeline: Data Ingestion, Transformation, and Storage](#7-etl-pipeline-data-ingestion-transformation-and-storage)
-- [8. Alernative Solution: Using Google Cloud for a more robust and scalable solution](#8-alernative-solution-using-google-cloud-for-a-more-robust-and-scalable-solution)
-  - [8.1. Google Cloud Services Used:](#81-google-cloud-services-used)
-  - [8.2. Graphical Representation:](#82-graphical-representation)
+- [7. Testing](#7-testing)
+  - [Running the tests](#running-the-tests)
+- [8. ETL Pipeline: Data Ingestion, Transformation, and Storage](#8-etl-pipeline-data-ingestion-transformation-and-storage)
+- [9. Alernative Solution: Using Google Cloud for a more robust and scalable solution](#9-alernative-solution-using-google-cloud-for-a-more-robust-and-scalable-solution)
+  - [9.1. Google Cloud Services Used:](#91-google-cloud-services-used)
+  - [9.2. Graphical Representation:](#92-graphical-representation)
 
 
 ## 1. Introduction
@@ -259,7 +261,31 @@ There are multiple valid approaches to building the requested solution. In this 
    
 4. **`database.py`**: Sets up database connection and configures SQLAlchemy to be used as ORM for the project.
 
-## 7. ETL Pipeline: Data Ingestion, Transformation, and Storage
+## 7. Testing
+The `/tests folder` contains two test files:
+
+1. `test_main.py`: Tests all API endpoints to ensure they return the expected responses.
+2. `test_helpers.py`: Tests the `clean_data()` and `get_invalid_rows()` functions using sample data to verify they behave as expected.
+
+### Running the tests
+Follow these steps to run the tests:
+
+1. Ensure the application is running. If it’s not, start it using Docker Compose:
+     ```bash
+     docker compose up
+     ```
+2. Open a new terminal and find the container ID of the application (named globant_data_engineer-web) by running:
+     ```bash
+     docker ps
+     ```
+     This will list all running containers.
+
+3. Copy the container ID of globant_data_engineer-web and use it in the following command:
+     ```bash
+     docker exec <container_id> pytest
+     ```
+     (Replace <container_id> with the actual ID you copied.)
+## 8. ETL Pipeline: Data Ingestion, Transformation, and Storage
 
 1. **Extract**: Receiving and Reading CSV Files
      - The API exposes a POST /upload-csv/ endpoint that receives three CSV files in a single request:
@@ -285,11 +311,11 @@ There are multiple valid approaches to building the requested solution. In this 
         - hired_employees (ID, name, datetime, department_id, job_id)
    - The API ensures that all three tables are populated in a single request, preventing inconsistencies in relational data.
   
-## 8. Alernative Solution: Using Google Cloud for a more robust and scalable solution
+## 9. Alernative Solution: Using Google Cloud for a more robust and scalable solution
 
 In this section, I will explain how to implement the same solution using Google Cloud services. This approach enables more data-intensive processing and automatically scales to handle larger files, including those exceeding 1 million rows.
 
-### 8.1. Google Cloud Services Used:
+### 9.1. Google Cloud Services Used:
 
 1. **Google Cloud Storage (GCS)**
 
@@ -327,6 +353,6 @@ In this section, I will explain how to implement the same solution using Google 
      Acts as a data warehouse, storing processed and structured data.
      The Cloud Run API queries BigQuery to provide real-time insights and reports.
 
-### 8.2. Graphical Representation:
+### 9.2. Graphical Representation:
 
 <img src="https://www.mermaidchart.com/raw/84b4612f-22e7-4871-9a27-c62e3f2e5967?theme=light&version=v0.1&format=svg" alt="Data Pipeline Flowchart" width="300">

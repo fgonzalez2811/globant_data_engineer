@@ -1,5 +1,5 @@
 """
-Helper functions are defined in this separate and 
+Helper functions are defined in this separate file and 
 imported into main.py file to improve 
 maintainability and readibility
 
